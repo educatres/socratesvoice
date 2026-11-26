@@ -106,7 +106,17 @@ function renderConversation() {
     const article = document.createElement('article'); article.className = `message ${message.role}`
     const heading = document.createElement('span'); heading.className = 'message-role'; heading.textContent = message.role === 'user' ? '你' : '蘇格拉底'
     const text = document.createElement('p'); text.textContent = message.content
-    article.append(heading, text); el.conversation.append(article)
+    article.append(heading, text)
+    if (message.role === 'assistant') {
+      const speakButton = document.createElement('button')
+      speakButton.className = 'message-speak'
+      speakButton.type = 'button'
+      speakButton.textContent = '🔊 朗讀這段'
+      speakButton.setAttribute('aria-label', '使用 iPhone 內建語音朗讀這段 AI 回覆')
+      speakButton.addEventListener('click', () => speakFromUserGesture(message.content))
+      article.append(speakButton)
+    }
+    el.conversation.append(article)
   }
   el.conversation.scrollTop = el.conversation.scrollHeight
 }
@@ -182,7 +192,17 @@ async function testConnection() {
   finally { el.testConnection.disabled = false }
 }
 
-function replayLastReply() { if (!lastReply) return; primeSpeechSynthesis(settings.language); populateVoices(); autoListen = false; state.set(STATES.SPEAKING, '正在重新朗讀上一則回覆。'); speaker.speak(lastReply) }
+function speakFromUserGesture(text) {
+  if (!text) return
+  autoListen = false
+  speaker.stop()
+  populateVoices()
+  window.speechSynthesis?.resume?.()
+  state.set(STATES.SPEAKING, '正在使用 iPhone 內建語音朗讀。')
+  speaker.speak(text)
+}
+
+function replayLastReply() { speakFromUserGesture(lastReply) }
 
 function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; el.replay.hidden = true; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
 

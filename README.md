@@ -12,6 +12,7 @@
 - Google AI Studio 同時支援原生 Gemini `generateContent` 與 OpenAI 相容 `/chat/completions` endpoint。
 - API 請求 45 秒逾時、AbortController 取消、429／401／403／404／5xx／CORS 可理解錯誤。
 - iOS Safari 朗讀預熱：開始說話／送出文字時先以無聲 utterance 解鎖 speech queue；若自動朗讀被瀏覽器攔截，可點「重新朗讀」以使用者手勢再次觸發。
+- AI 回覆下方提供「朗讀這段」，直接呼叫 iPhone Safari 的 `window.speechSynthesis`／`SpeechSynthesisUtterance`，不使用外部 TTS API。
 - 最近 10 輪對話（最多 20 則訊息）；蘇格拉底模式及一般對話模式。
 - API Key 預設只在記憶體；只有使用者勾選保存時才寫入 `sessionStorage`，永不使用 `localStorage` 保存 Key。其他 UI 設定可保存在 localStorage。
 - 首次使用的語音／資料外送告知；頁面離開前景會停止收音、朗讀與模型請求。
