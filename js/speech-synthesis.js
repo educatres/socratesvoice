@@ -23,14 +23,16 @@ export function speechSynthesisSupported() {
 /**
  * iOS Safari may ignore the first speech request if it happens after an async
  * fetch. Calling this from a user gesture unlocks the speech queue. The
- * zero-volume utterance is intentionally silent and has no application text.
+ * The zero-volume utterance is intentionally silent. It must remain in the
+ * queue until the real response is queued; cancelling it removes Safari's
+ * user-gesture unlock and makes the later response silently fail.
  */
 export function primeSpeechSynthesis(lang = 'zh-TW') {
   if (!speechSynthesisSupported()) return false
   const synthesis = window.speechSynthesis
   try {
     synthesis.resume?.()
-    const unlock = new SpeechSynthesisUtterance('\u200b')
+    const unlock = new SpeechSynthesisUtterance(' ')
     unlock.lang = lang
     unlock.volume = 0
     unlock.rate = 10
