@@ -23,6 +23,11 @@ export function createAvatar(stage, caption) {
   }
   return {
     setState(state) { stage.dataset.state = state; caption.textContent = LABELS[state] || LABELS.idle },
+    setVariant(variant) {
+      const general = variant === 'general'
+      stage.dataset.variant = general ? 'general' : 'socratic'
+      stage.querySelector('.socrates')?.setAttribute('aria-label', general ? '黑白現代風格女性 AI 頭像' : '希臘風格女性蘇格拉底式 AI 頭像')
+    },
     start() { if (!timer && !activeAction) schedule() },
     stop() { window.clearTimeout(timer); timer = 0; if (activeAction) stage.classList.remove(activeAction); activeAction = '' },
   }
