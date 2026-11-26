@@ -36,10 +36,9 @@ const state = new ConversationState((next, detail) => {
   el.avatarStage.dataset.state = next
   avatar.setState(next)
   el.statusDot.className = `status-dot status-${next}`
-  const active = next !== STATES.IDLE && next !== STATES.AWAIT_TAP && next !== STATES.ERROR
-  el.start.disabled = active && next !== STATES.LISTENING
-  el.stop.disabled = !active
-  el.startLabel.textContent = next === STATES.LISTENING ? '收音中…' : next === STATES.SPEAKING ? '朗讀中…' : '開始說話'
+  el.start.disabled = next === STATES.THINKING
+  el.stop.disabled = true
+  el.startLabel.textContent = next === STATES.LISTENING ? '停止收音' : next === STATES.SPEAKING ? '朗讀中…' : '開始收音'
   if (next === STATES.ERROR) el.retry.hidden = false
   else if (next !== STATES.THINKING) el.retry.hidden = true
 })
@@ -146,7 +145,9 @@ function beginListening(isAuto = false) {
   if (consentNeeded) { el.consent.hidden = false; return }
   if (!settings.apiKey.trim()) { openSettings(true); setStatusError('請先輸入 API Key，再開始語音對話。'); return }
   if (!recognitionSupported()) { state.set(STATES.AWAIT_TAP, '此瀏覽器不支援語音辨識，請在下方文字框輸入訊息。'); el.manual.focus(); return }
-  autoListen = isAuto || el.mode.value !== 'general'
+  // Both conversation modes return to microphone capture after TTS. The
+  // mode controls the prompt style, not whether the hands-free loop runs.
+  autoListen = true
   state.beginSession(); const session = state.session; const turn = state.nextTurn(); resetRecognition(); recognitionEnded = false
   recognition = createRecognition({ lang: settings.language, onStart: () => { window.clearTimeout(recognitionWatchdog); recognitionStarted = true; state.set(STATES.LISTENING); el.interimLabel.textContent = '辨識中'; el.interim.textContent = '請說話…' }, onInterim: (text) => { el.interim.textContent = text; el.interimLabel.textContent = '辨識中' }, onFinal: (text) => { pendingText = `${pendingText} ${text}`.trim(); try { recognition?.stop() } catch { /* ignore */ } }, onError: (error) => { if (error === 'aborted') return; resetRecognition(); if (error === 'not-allowed' || error === 'service-not-allowed') setStatusError('麥克風權限被拒絕，請在 Safari 網站設定允許麥克風，或改用文字輸入。'); else setStatusError(`語音辨識失敗（${error}），可重試或改用文字輸入。`) }, onEnd: () => { window.clearTimeout(recognitionWatchdog); recognitionEnded = true; if (pendingText) finishListening(session, turn); else if (state.state === STATES.LISTENING && recognitionStarted) state.set(STATES.AWAIT_TAP, '沒有辨識到文字，請再試一次。') } })
   try { recognition.start() } catch { setStatusError('無法啟動麥克風，請重試或改用文字輸入。') }
@@ -197,7 +198,7 @@ async function testConnection() {
 
 function speakFromUserGesture(text) {
   if (!text) return
-  autoListen = false
+  autoListen = true
   speaker.stop()
   populateVoices()
   window.speechSynthesis?.resume?.()
@@ -207,17 +208,25 @@ function speakFromUserGesture(text) {
 
 function replayLastReply() { speakFromUserGesture(lastReply) }
 
+function primaryAction() {
+  if (state.state === STATES.LISTENING) { stopAll(); return }
+  if (state.state === STATES.SPEAKING) { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按開始收音繼續。'); return }
+  if (state.state === STATES.THINKING) return
+  beginListening(false)
+}
+
 function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; el.replay.hidden = true; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
 
 function setupEvents() {
   el.settingsToggle.addEventListener('click', () => el.settingsPanel.hidden ? openSettings() : closeSettings()); el.settingsClose.addEventListener('click', closeSettings)
   el.provider.addEventListener('change', (event) => selectProvider(event.target.value)); el.key.addEventListener('input', () => { settings = { ...settings, apiKey: el.key.value }; models = []; showModels(''); persist() }); el.toggleKey.addEventListener('click', () => { const visible = el.key.type === 'text'; el.key.type = visible ? 'password' : 'text'; el.toggleKey.textContent = visible ? '顯示' : '隱藏' }); el.clearKey.addEventListener('click', () => { clearStoredKey(settings.provider); settings = { ...settings, apiKey: '', rememberKey: false }; el.key.value = ''; el.remember.checked = false; persist(); showModels('已清除目前 Provider 的 API Key。') }); el.remember.addEventListener('change', () => { settings = { ...settings, rememberKey: el.remember.checked }; persist() }); el.base.addEventListener('change', () => { settings = { ...settings, baseUrl: el.base.value.trim() }; persist() }); el.model.addEventListener('input', () => { settings = { ...settings, modelId: el.model.value.trim() }; persist() }); el.reasoning.addEventListener('change', () => { settings = { ...settings, reasoningEffort: el.reasoning.value }; persist() }); el.testProvider.addEventListener('click', testProvider); el.testConnection.addEventListener('click', testConnection)
   el.language.addEventListener('change', () => { settings = { ...settings, language: el.language.value, voiceName: '' }; persist(); populateVoices() }); el.voice.addEventListener('change', () => { settings = { ...settings, voiceName: el.voice.value }; persist() }); el.rate.addEventListener('input', () => { settings = { ...settings, rate: Number(el.rate.value) }; el.rateValue.value = el.rate.value; persist() }); el.mode.addEventListener('change', () => { settings = { ...settings, mode: el.mode.value }; persist() })
-  el.start.addEventListener('click', () => beginListening(false)); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按「重新朗讀」或開始說話繼續。') }); el.replay.addEventListener('click', replayLastReply); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { if (state.state === STATES.SPEAKING) speaker.stop(); primeSpeechSynthesis(settings.language); populateVoices(); state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
+  el.start.addEventListener('click', primaryAction); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按「重新朗讀」或開始說話繼續。') }); el.replay.addEventListener('click', replayLastReply); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { if (state.state === STATES.SPEAKING) speaker.stop(); primeSpeechSynthesis(settings.language); populateVoices(); state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
   el.consentAccept.addEventListener('click', () => { saveConsent(); consentNeeded = false; el.consent.hidden = true; beginListening(false) }); window.speechSynthesis?.addEventListener?.('voiceschanged', populateVoices); document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && (state.state === STATES.LISTENING || state.state === STATES.SPEAKING || state.state === STATES.THINKING)) stopAll() })
 }
 
-renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); state.set(STATES.IDLE)
+document.body.classList.add('minimal-mode')
+renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); avatar.start(); state.set(STATES.IDLE)
 if (!recognitionSupported()) el.statusDetail.textContent = '此瀏覽器不支援語音辨識，仍可使用下方文字輸入。'
 if (consentNeeded) el.consent.hidden = false
 if (!settings.apiKey) openSettings()
