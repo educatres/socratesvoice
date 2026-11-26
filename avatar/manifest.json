@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "title": "Socrates Voice Avatar sprite frames",
+  "background": "#000000",
+  "outputSize": [
+    256,
+    256
+  ],
+  "source": "overview.png",
+  "licenseNote": "Generated for this project; verify any necessary usage rights according to your environment.",
+  "states": {
+    "modern": {
+      "idle": {
+        "frames": [
+          {
+            "png": "assets/modern/idle/idle_01.png",
+            "webp": "assets/modern/idle/idle_01.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/modern/idle/idle_02.png",
+            "webp": "assets/modern/idle/idle_02.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/idle/idle_03.png",
+            "webp": "assets/modern/idle/idle_03.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/modern/idle/idle_04.png",
+            "webp": "assets/modern/idle/idle_04.webp",
+            "durationMs": 140
+          },
+          {
+            "png": "assets/modern/idle/idle_05.png",
+            "webp": "assets/modern/idle/idle_05.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/modern/idle/idle_06.png",
+            "webp": "assets/modern/idle/idle_06.webp",
+            "durationMs": 620
+          },
+          {
+            "png": "assets/modern/idle/idle_07.png",
+            "webp": "assets/modern/idle/idle_07.webp",
+            "durationMs": 700
+          },
+          {
+            "png": "assets/modern/idle/idle_08.png",
+            "webp": "assets/modern/idle/idle_08.webp",
+            "durationMs": 620
+          },
+          {
+            "png": "assets/modern/idle/idle_09.png",
+            "webp": "assets/modern/idle/idle_09.webp",
+            "durationMs": 140
+          },
+          {
+            "png": "assets/modern/idle/idle_10.png",
+            "webp": "assets/modern/idle/idle_10.webp",
+            "durationMs": 760
+          },
+          {
+            "png": "assets/modern/idle/idle_11.png",
+            "webp": "assets/modern/idle/idle_11.webp",
+            "durationMs": 800
+          }
+        ],
+        "loop": true,
+        "description": "自然待機/轉頭/眨眼"
+      },
+      "speaking": {
+        "frames": [
+          {
+            "png": "assets/modern/speaking/speaking_01.png",
+            "webp": "assets/modern/speaking/speaking_01.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/modern/speaking/speaking_02.png",
+            "webp": "assets/modern/speaking/speaking_02.webp",
+            "durationMs": 170
+          },
+          {
+            "png": "assets/modern/speaking/speaking_03.png",
+            "webp": "assets/modern/speaking/speaking_03.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/modern/speaking/speaking_04.png",
+            "webp": "assets/modern/speaking/speaking_04.webp",
+            "durationMs": 150
+          },
+          {
+            "png": "assets/modern/speaking/speaking_05.png",
+            "webp": "assets/modern/speaking/speaking_05.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/modern/speaking/speaking_06.png",
+            "webp": "assets/modern/speaking/speaking_06.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/modern/speaking/speaking_07.png",
+            "webp": "assets/modern/speaking/speaking_07.webp",
+            "durationMs": 170
+          },
+          {
+            "png": "assets/modern/speaking/speaking_08.png",
+            "webp": "assets/modern/speaking/speaking_08.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/modern/speaking/speaking_09.png",
+            "webp": "assets/modern/speaking/speaking_09.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/modern/speaking/speaking_10.png",
+            "webp": "assets/modern/speaking/speaking_10.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/modern/speaking/speaking_11.png",
+            "webp": "assets/modern/speaking/speaking_11.webp",
+            "durationMs": 140
+          }
+        ],
+        "loop": true,
+        "description": "講話嘴型變動"
+      },
+      "thinking": {
+        "frames": [
+          {
+            "png": "assets/modern/thinking/thinking_01.png",
+            "webp": "assets/modern/thinking/thinking_01.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_02.png",
+            "webp": "assets/modern/thinking/thinking_02.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/modern/thinking/thinking_03.png",
+            "webp": "assets/modern/thinking/thinking_03.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_04.png",
+            "webp": "assets/modern/thinking/thinking_04.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_05.png",
+            "webp": "assets/modern/thinking/thinking_05.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_06.png",
+            "webp": "assets/modern/thinking/thinking_06.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_07.png",
+            "webp": "assets/modern/thinking/thinking_07.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_08.png",
+            "webp": "assets/modern/thinking/thinking_08.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_09.png",
+            "webp": "assets/modern/thinking/thinking_09.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/modern/thinking/thinking_10.png",
+            "webp": "assets/modern/thinking/thinking_10.webp",
+            "durationMs": 750
+          },
+          {
+            "png": "assets/modern/thinking/thinking_11.png",
+            "webp": "assets/modern/thinking/thinking_11.webp",
+            "durationMs": 700
+          }
+        ],
+        "loop": true,
+        "description": "仰望思考/提問"
+      }
+    },
+    "socrates": {
+      "idle": {
+        "frames": [
+          {
+            "png": "assets/socrates/idle/idle_01.png",
+            "webp": "assets/socrates/idle/idle_01.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/socrates/idle/idle_02.png",
+            "webp": "assets/socrates/idle/idle_02.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/idle/idle_03.png",
+            "webp": "assets/socrates/idle/idle_03.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/socrates/idle/idle_04.png",
+            "webp": "assets/socrates/idle/idle_04.webp",
+            "durationMs": 140
+          },
+          {
+            "png": "assets/socrates/idle/idle_05.png",
+            "webp": "assets/socrates/idle/idle_05.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/socrates/idle/idle_06.png",
+            "webp": "assets/socrates/idle/idle_06.webp",
+            "durationMs": 620
+          },
+          {
+            "png": "assets/socrates/idle/idle_07.png",
+            "webp": "assets/socrates/idle/idle_07.webp",
+            "durationMs": 700
+          },
+          {
+            "png": "assets/socrates/idle/idle_08.png",
+            "webp": "assets/socrates/idle/idle_08.webp",
+            "durationMs": 620
+          },
+          {
+            "png": "assets/socrates/idle/idle_09.png",
+            "webp": "assets/socrates/idle/idle_09.webp",
+            "durationMs": 140
+          },
+          {
+            "png": "assets/socrates/idle/idle_10.png",
+            "webp": "assets/socrates/idle/idle_10.webp",
+            "durationMs": 760
+          },
+          {
+            "png": "assets/socrates/idle/idle_11.png",
+            "webp": "assets/socrates/idle/idle_11.webp",
+            "durationMs": 800
+          }
+        ],
+        "loop": true,
+        "description": "自然待機/轉頭/眨眼"
+      },
+      "speaking": {
+        "frames": [
+          {
+            "png": "assets/socrates/speaking/speaking_01.png",
+            "webp": "assets/socrates/speaking/speaking_01.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_02.png",
+            "webp": "assets/socrates/speaking/speaking_02.webp",
+            "durationMs": 170
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_03.png",
+            "webp": "assets/socrates/speaking/speaking_03.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_04.png",
+            "webp": "assets/socrates/speaking/speaking_04.webp",
+            "durationMs": 150
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_05.png",
+            "webp": "assets/socrates/speaking/speaking_05.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_06.png",
+            "webp": "assets/socrates/speaking/speaking_06.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_07.png",
+            "webp": "assets/socrates/speaking/speaking_07.webp",
+            "durationMs": 170
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_08.png",
+            "webp": "assets/socrates/speaking/speaking_08.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_09.png",
+            "webp": "assets/socrates/speaking/speaking_09.webp",
+            "durationMs": 180
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_10.png",
+            "webp": "assets/socrates/speaking/speaking_10.webp",
+            "durationMs": 190
+          },
+          {
+            "png": "assets/socrates/speaking/speaking_11.png",
+            "webp": "assets/socrates/speaking/speaking_11.webp",
+            "durationMs": 140
+          }
+        ],
+        "loop": true,
+        "description": "講話嘴型變動"
+      },
+      "thinking": {
+        "frames": [
+          {
+            "png": "assets/socrates/thinking/thinking_01.png",
+            "webp": "assets/socrates/thinking/thinking_01.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_02.png",
+            "webp": "assets/socrates/thinking/thinking_02.webp",
+            "durationMs": 650
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_03.png",
+            "webp": "assets/socrates/thinking/thinking_03.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_04.png",
+            "webp": "assets/socrates/thinking/thinking_04.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_05.png",
+            "webp": "assets/socrates/thinking/thinking_05.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_06.png",
+            "webp": "assets/socrates/thinking/thinking_06.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_07.png",
+            "webp": "assets/socrates/thinking/thinking_07.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_08.png",
+            "webp": "assets/socrates/thinking/thinking_08.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_09.png",
+            "webp": "assets/socrates/thinking/thinking_09.webp",
+            "durationMs": 600
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_10.png",
+            "webp": "assets/socrates/thinking/thinking_10.webp",
+            "durationMs": 750
+          },
+          {
+            "png": "assets/socrates/thinking/thinking_11.png",
+            "webp": "assets/socrates/thinking/thinking_11.webp",
+            "durationMs": 700
+          }
+        ],
+        "loop": true,
+        "description": "仰望思考/提問"
+      }
+    }
+  },
+  "notes": [
+    "66 still images cropped from a generated overview sheet; not a rigged character or phoneme-accurate lip sync.",
+    "Original artwork is relatively small in the overview. Larger output frames are upscaled, not newly rendered high-resolution artwork.",
+    "Use CSS transform for small fluid motion; use mouth loop while TTS is speaking."
+  ]
+}

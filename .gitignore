@@ -1,6 +1,8 @@
 node_modules/
 dist/
 __參考資料/
+Socrates_Avatar_Assets/
+Socrates_Avatar_Assets.zip
 .DS_Store
 *.log
 .env

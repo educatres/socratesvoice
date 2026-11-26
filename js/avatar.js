@@ -2,11 +2,15 @@ const LABELS = { idle: '待命', listening: '聆聽中', thinking: '思考中', 
 export function createAvatar(stage, caption) {
   let timer = 0
   let activeAction = ''
+  let player = null
+  let currentVariant = 'socrates'
+  let currentState = 'idle'
   const actions = [
     ['face-blink', 180], ['face-blink', 220], ['face-brow', 650],
     ['face-turn', 1150], ['face-mouth', 600], ['face-blink', 180],
   ]
   const schedule = () => {
+    if (player) return
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const [className, duration] = actions[Math.floor(Math.random() * actions.length)]
     const delay = 1800 + Math.floor(Math.random() * 6200)
@@ -22,11 +26,27 @@ export function createAvatar(stage, caption) {
     }, delay)
   }
   return {
-    setState(state) { stage.dataset.state = state; caption.textContent = LABELS[state] || LABELS.idle },
+    setPlayer(nextPlayer) {
+      player = nextPlayer
+      if (currentVariant) player.setMode(currentVariant === 'general' ? 'modern' : 'socrates')
+      player.setState(currentState)
+      window.clearTimeout(timer)
+      timer = 0
+      activeAction = ''
+      stage.classList.remove('face-blink', 'face-brow', 'face-turn', 'face-mouth')
+    },
+    setState(state) {
+      currentState = state === 'thinking' || state === 'speaking' ? state : 'idle'
+      stage.dataset.state = state
+      caption.textContent = LABELS[state] || LABELS.idle
+      player?.setState(currentState)
+    },
     setVariant(variant) {
       const general = variant === 'general'
+      currentVariant = general ? 'general' : 'socratic'
       stage.dataset.variant = general ? 'general' : 'socratic'
       stage.querySelector('.socrates')?.setAttribute('aria-label', general ? '黑白現代風格女性 AI 頭像' : '希臘風格女性蘇格拉底式 AI 頭像')
+      player?.setMode(currentVariant === 'general' ? 'modern' : 'socrates')
     },
     start() { if (!timer && !activeAction) schedule() },
     stop() { window.clearTimeout(timer); timer = 0; if (activeAction) stage.classList.remove(activeAction); activeAction = '' },

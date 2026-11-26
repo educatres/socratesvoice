@@ -7,7 +7,7 @@
     <meta name="description" content="以語音與蘇格拉底式 AI 對話的純前端工具" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'self' https://api.openai.com https://api.x.ai https://generativelanguage.googleapis.com https://air.cgu.edu.tw; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
     <title>Socrates Voice AI｜蘇格拉底語音 AI</title>
-    <link rel="stylesheet" href="./css/app.css?v=menu-35e53b9" />
+    <link rel="stylesheet" href="./css/app.css?v=assets-20261126" />
   </head>
   <body>
     <div class="app-shell">
@@ -101,6 +101,7 @@
         <section class="hero" aria-labelledby="status-label">
           <div class="avatar-stage" id="avatar-stage" data-state="idle" data-variant="socratic">
             <div class="avatar-glow"></div>
+            <img id="avatar-image" class="avatar-image" width="256" height="256" alt="AI 語音助教角色動畫" decoding="async" />
             <div class="socrates greek-woman" aria-label="希臘風格女性蘇格拉底式 AI 頭像" role="img">
               <div class="wheat-crown" aria-hidden="true"><span class="wheat-sprig wheat-one"></span><span class="wheat-sprig wheat-two"></span><span class="wheat-sprig wheat-three"></span><span class="wheat-sprig wheat-four"></span></div>
               <div class="hair-back"></div><div class="shoulders"></div><div class="neck"></div>
@@ -134,6 +135,6 @@
 
       <footer><span>純前端・API Key 由你自行管理</span><a href="./Socrates_Voice_AI_Spec.md" target="_blank" rel="noreferrer">開發規格</a></footer>
     </div>
-    <script type="module" src="./js/app.js?v=menu-35e53b9"></script>
+    <script type="module" src="./js/app.js?v=assets-20261126"></script>
   </body>
 </html>

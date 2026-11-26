@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>蘇格拉底語音角色：分切影格預覽</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", system-ui, sans-serif; }
+    body { background:#141416; color:#fff; margin:0; padding:24px; display:grid; justify-items:center; gap:16px; }
+    h1 { font-size:1.3rem; margin:0; }
+    .stage { width:min(80vw,360px); aspect-ratio:1/1; background:#000; display:grid; place-items:center; overflow:hidden; border-radius:16px; }
+    .avatar { width:100%; height:100%; object-fit:contain; background:#000; animation:sway 7s ease-in-out infinite alternate; }
+    @keyframes sway { from{transform:rotate(-.65deg) translateY(1px)} to{transform:rotate(.65deg) translateY(-2px)} }
+    @media (prefers-reduced-motion:reduce){.avatar{animation:none}}
+    .controls{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
+    button {font:inherit; padding:10px 15px; border:1px solid #777; background:#25252b; color:white; border-radius:8px;}
+    button[aria-pressed="true"] { background:#53407c; border-color:#ad90ff; }
+    p { color:#ccc; max-width:700px; text-align:center; line-height:1.7; }
+    #status{font-size:.9rem;color:#ffcf83;min-height:20px}
+  </style>
+</head>
+<body>
+  <h1>AI 語音角色動畫影格預覽</h1>
+  <div class="stage"><img id="avatar" class="avatar" src="" alt="角色動畫" /></div>
+  <div class="controls" id="modes">
+    <button type="button" data-mode="modern" aria-pressed="true">一般模式</button>
+    <button type="button" data-mode="socrates" aria-pressed="false">蘇格拉底模式</button>
+  </div>
+  <div class="controls" id="states">
+    <button type="button" data-state="idle" aria-pressed="true">待機・眨眼</button>
+    <button type="button" data-state="speaking" aria-pressed="false">說話・嘴形</button>
+    <button type="button" data-state="thinking" aria-pressed="false">思考・提問</button>
+  </div>
+  <p>這只是角色素材預覽，不包含語音辨識、LLM 或 TTS。正式專案請在開始朗讀時切換 speaking，結束時切回 idle。</p>
+  <div id="status"></div>
+  <script type="module">
+    import { createAvatarPlayer } from './avatar-player.js';
+    const status = document.getElementById('status');
+    try {
+      const player = await createAvatarPlayer(document.getElementById('avatar'));
+      document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{
+        player.setMode(b.dataset.mode);
+        document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+      }));
+      document.querySelectorAll('[data-state]').forEach(b=>b.addEventListener('click',()=>{
+        player.setState(b.dataset.state);
+        document.querySelectorAll('[data-state]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+      }));
+    } catch (err) { status.textContent = err.message + '（請用 HTTP(S) 伺服器開啟，勿直接雙擊本機檔案）'; }
+  </script>
+</body>
+</html>

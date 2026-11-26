@@ -4,11 +4,12 @@ import { PROVIDERS, clearStoredKey, hasConsent, loadSettings, providerFor, saveC
 import { ConversationState, STATES } from './state-machine.js'
 import { createRecognition, recognitionSupported } from './speech-recognition.js'
 import { createSpeaker, primeSpeechSynthesis } from './speech-synthesis.js'
+import { createAvatarPlayer } from '../avatar/avatar-player.js'
 
 const $ = (id) => document.getElementById(id)
 const el = {
   settingsToggle: $('settings-toggle'), settingsPanel: $('settings-panel'), settingsClose: $('settings-close'), menuToggle: $('menu-toggle'), menu: $('quick-menu'), menuClose: $('menu-close'), menuClearConversation: $('menu-clear-conversation'), provider: $('provider-select'), key: $('api-key'), toggleKey: $('toggle-key'), clearKey: $('clear-key'), remember: $('remember-key'), base: $('base-url'), model: $('model-id'), reasoning: $('reasoning-effort'), providerHint: $('provider-hint'), keyHint: $('key-hint'), testProvider: $('test-provider'), testConnection: $('test-connection'), modelResults: $('model-results'),
-  avatarStage: $('avatar-stage'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), replay: $('replay-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), rateValue: $('rate-value'), mode: $('conversation-mode'), consent: $('consent'), consentAccept: $('consent-accept'),
+  avatarStage: $('avatar-stage'), avatarImage: $('avatar-image'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), replay: $('replay-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), rateValue: $('rate-value'), mode: $('conversation-mode'), consent: $('consent'), consentAccept: $('consent-accept'),
 }
 
 const stateLabels = { idle: ['待命', '輸入 API Key 後，按一下開始說話。'], listening: ['聆聽中', '請說話；辨識完成後會送出這一輪內容。'], thinking: ['思考中', '正在將你的話交給模型，請稍候。'], speaking: ['說話中', 'AI 正在朗讀回覆；此時不會啟動麥克風。'], 'await-tap': ['點一下繼續', '自動續聽受到瀏覽器限制，請按開始說話。'], error: ['錯誤', '請檢查設定或重試。'] }
@@ -217,6 +218,22 @@ function primaryAction() {
   beginListening(false)
 }
 
+async function loadAvatarAssets() {
+  try {
+    const player = await createAvatarPlayer(el.avatarImage, {
+      manifestUrl: './avatar/manifest.json',
+      mode: settings.mode === 'general' ? 'modern' : 'socrates',
+      state: 'idle',
+      format: 'webp',
+    })
+    avatar.setPlayer(player)
+    el.avatarStage.classList.add('asset-ready')
+  } catch (error) {
+    el.avatarStage.classList.add('asset-fallback')
+    el.avatarImage.alt = 'CSS 頭像備援'
+  }
+}
+
 function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; el.replay.hidden = true; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
 
 function setupEvents() {
@@ -228,7 +245,7 @@ function setupEvents() {
 }
 
 document.body.classList.add('minimal-mode')
-renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); avatar.setVariant(settings.mode); avatar.start(); state.set(STATES.IDLE)
+renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); avatar.setVariant(settings.mode); avatar.start(); state.set(STATES.IDLE); loadAvatarAssets()
 if (!recognitionSupported()) el.statusDetail.textContent = '此瀏覽器不支援語音辨識，仍可使用下方文字輸入。'
 if (consentNeeded) el.consent.hidden = false
 if (!settings.apiKey) openSettings()

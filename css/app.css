@@ -40,6 +40,8 @@ h2 { font-size: 1.05rem; margin-bottom: 0; }
 .hero { text-align: center; padding: 12px 0 8px; }
 .avatar-stage { position: relative; height: clamp(240px, 48vw, 390px); max-width: 600px; margin: 0 auto; display: grid; place-items: center; overflow: hidden; }
 .avatar-glow { position: absolute; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(circle, rgba(210,166,88,.18), transparent 68%); filter: blur(5px); }
+.avatar-image { display: none; position: relative; z-index: 2; width: min(70vw, 420px); height: min(70vw, 420px); object-fit: contain; background: #000; animation: breathe 8s ease-in-out infinite; }
+.avatar-stage.asset-ready .avatar-image { display: block; }.avatar-stage.asset-ready .socrates { display: none; }.avatar-stage.asset-ready .avatar-glow { opacity: .55; }
 .socrates { position: relative; width: min(56vw, 280px); height: min(56vw, 280px); animation: breathe 8s ease-in-out infinite; }
 .greek-woman .hair-back { position: absolute; z-index: 0; inset: 4% 8% 14%; border-radius: 48% 48% 38% 38%; background: linear-gradient(100deg,#3d241b,#8d5735 48%,#2b1915); box-shadow: inset -12px -8px 18px rgba(28,12,8,.38); }
 .greek-woman .head { position: absolute; z-index: 1; inset: 12% 18% 17%; border-radius: 48% 48% 46% 46%; background: linear-gradient(120deg,#c88361,#f0b08d 52%,#b86e55); box-shadow: inset -12px -9px 18px rgba(72,26,22,.22); }
