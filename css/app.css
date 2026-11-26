@@ -7,7 +7,7 @@ button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .45; }
 a { color: var(--gold); }
 .app-shell { width: min(100%, 900px); margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; }.topbar-actions { display: flex; align-items: center; gap: 8px; }
 .eyebrow { color: var(--gold); font-size: .7rem; letter-spacing: .2em; margin: 0 0 6px; }
 h1, h2, h3, p { margin-top: 0; }
 h1 { font-family: Georgia, serif; font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 500; margin: 0; }
@@ -15,6 +15,8 @@ h2 { font-size: 1.05rem; margin-bottom: 0; }
 .icon-button { border: 1px solid var(--border); color: var(--gold); background: #11100e; width: 44px; height: 44px; min-width: 44px; border-radius: 50%; font-size: 1.25rem; }
 .icon-button.subtle { color: var(--muted); border: 0; background: transparent; font-size: 1.7rem; }
 .settings-panel { background: rgba(23, 22, 19, .98); border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin: 18px 0 10px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
+.quick-menu { position: fixed; z-index: 30; top: max(14px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: min(94vw, 680px); max-height: calc(100svh - max(28px, env(safe-area-inset-top)) - max(18px, env(safe-area-inset-bottom))); overflow: auto; padding: 18px; border: 1px solid var(--border); border-radius: 18px; background: rgba(17,16,14,.98); box-shadow: 0 24px 80px rgba(0,0,0,.6); }
+.quick-menu-heading, .menu-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.menu-section { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; }.menu-section > h2, .menu-section-heading h2 { font-size: .98rem; margin: 0; }.quick-menu .conversation { margin-top: 10px; }.quick-menu .voice-settings { margin-top: 10px; border-top: 0; padding-top: 0; }
 .panel-heading, .card-heading, .settings-actions, .manual-actions, .primary-controls, .secondary-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .settings-grid, .voice-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: .86rem; color: #e8e2d7; }
@@ -39,19 +41,20 @@ h2 { font-size: 1.05rem; margin-bottom: 0; }
 .avatar-stage { position: relative; height: clamp(240px, 48vw, 390px); max-width: 600px; margin: 0 auto; display: grid; place-items: center; overflow: hidden; }
 .avatar-glow { position: absolute; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(circle, rgba(210,166,88,.18), transparent 68%); filter: blur(5px); }
 .socrates { position: relative; width: min(56vw, 280px); height: min(56vw, 280px); animation: breathe 8s ease-in-out infinite; }
-.head { position: absolute; inset: 10% 12% 15%; border-radius: 48% 48% 44% 44%; background: linear-gradient(120deg,#d9b487,#f1ce9c 50%,#bb8c5a); box-shadow: inset -14px -10px 20px rgba(72,40,22,.26); }
-.hair { position: absolute; inset: -4% -2% auto; height: 38%; border-radius: 50% 50% 28% 28%; background: #e8e0d1; opacity: .92; }
+.greek-woman .hair-back { position: absolute; z-index: 0; inset: 4% 8% 14%; border-radius: 48% 48% 38% 38%; background: linear-gradient(100deg,#3d241b,#8d5735 48%,#2b1915); box-shadow: inset -12px -8px 18px rgba(28,12,8,.38); }
+.greek-woman .head { position: absolute; z-index: 1; inset: 12% 18% 17%; border-radius: 48% 48% 46% 46%; background: linear-gradient(120deg,#c88361,#f0b08d 52%,#b86e55); box-shadow: inset -12px -9px 18px rgba(72,26,22,.22); }
+.greek-woman .hair { position: absolute; z-index: 2; inset: -10% -10% auto; height: 42%; border-radius: 50% 50% 30% 30%; background: linear-gradient(110deg,#4b2a1e,#a46a43 55%,#42231a); }
 .brow { position: absolute; top: 32%; width: 24%; height: 6px; border-radius: 50%; background: #684c32; }
 .brow-left { left: 20%; transform: rotate(8deg); }.brow-right { right: 20%; transform: rotate(-8deg); }
 .eye { position: absolute; top: 39%; width: 10px; height: 10px; border-radius: 50%; background: #17130e; animation: blink 7s infinite; }.eye-left { left: 27%; }.eye-right { right: 27%; }
 .nose { position: absolute; left: 47%; top: 38%; width: 8%; height: 23%; border-left: 3px solid rgba(117,74,39,.35); border-bottom: 3px solid rgba(117,74,39,.35); transform: rotate(-10deg); border-radius: 0 0 0 80%; }
-.beard { position: absolute; left: 15%; right: 15%; bottom: 0; height: 50%; border-radius: 25% 25% 45% 45%; background: linear-gradient(120deg,#fffef4,#d9d4c8 60%,#aaa69d); clip-path: polygon(5% 0,95% 0,86% 73%,64% 94%,50% 100%,36% 94%,14% 73%); }
-.mouth { position: absolute; z-index: 2; left: 42%; top: 61%; width: 16%; height: 5px; border-radius: 50%; background: #7c4a38; }.socrates[data-speaking="true"] .mouth { animation: mouth .25s infinite alternate; }
-.shoulders { position: absolute; z-index: -1; left: -8%; right: -8%; bottom: -10%; height: 35%; border-radius: 50% 50% 0 0; background: #4d5360; }
+.greek-woman .cheek { position: absolute; top: 58%; width: 15%; height: 8%; border-radius: 50%; background: rgba(214,108,104,.22); }.greek-woman .cheek-left { left: 16%; }.greek-woman .cheek-right { right: 16%; }
+.greek-woman .mouth { position: absolute; z-index: 3; left: 40%; top: 65%; width: 20%; height: 7px; border-bottom: 3px solid #873e4e; border-radius: 50%; }.socrates[data-speaking="true"] .mouth { animation: mouth .25s infinite alternate; }
+.greek-woman .neck { position: absolute; z-index: 0; left: 39%; right: 39%; bottom: 12%; height: 19%; border-radius: 0 0 30% 30%; background: #c47b5d; }.greek-woman .shoulders { position: absolute; z-index: -1; left: -8%; right: -8%; bottom: -10%; height: 35%; border-radius: 50% 50% 0 0; background: linear-gradient(135deg,#b7c5d4,#5b7187 55%,#354a5e); }
 .laurel { position: absolute; z-index: 3; top: 8%; width: 35%; height: 40%; border: 5px solid #b38a43; border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; transform: rotate(-28deg); }.laurel-left { left: -1%; }.laurel-right { right: -1%; transform: scaleX(-1) rotate(-28deg); }
 .avatar-caption { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); border: 1px solid #5b4a31; border-radius: 99px; padding: 5px 13px; background: rgba(5,5,5,.9); color: var(--gold); font-size: .82rem; }
 .avatar-stage[data-state="listening"] .avatar-glow { background: radial-gradient(circle, rgba(92,174,204,.27), transparent 68%); animation: pulse 1.8s infinite; }.avatar-stage[data-state="thinking"] .socrates { animation: think 4s ease-in-out infinite; }.avatar-stage[data-state="speaking"] .mouth { animation: mouth .25s infinite alternate; }.avatar-stage[data-state="error"] .avatar-glow { background: radial-gradient(circle, rgba(198,90,82,.25), transparent 68%); }
-.avatar-stage.face-blink .eye { animation: none; transform: scaleY(.08); }.avatar-stage.face-brow .brow-left { transform: translateY(-4px) rotate(8deg); }.avatar-stage.face-brow .brow-right { transform: translateY(-4px) rotate(-8deg); }.avatar-stage.face-turn .head { transform: rotate(-3deg) translateX(-2px); }.avatar-stage.face-mouth .mouth { animation: mouth .16s infinite alternate; }
+.avatar-stage.face-blink .eye { animation: none; transform: scaleY(.08); }.avatar-stage.face-brow .brow-left { transform: translateY(-4px) rotate(8deg); }.avatar-stage.face-brow .brow-right { transform: translateY(-4px) rotate(-8deg); }.avatar-stage.face-turn .head, .avatar-stage.face-turn .hair-back { transform: rotate(-3deg) translateX(-2px); }.avatar-stage.face-mouth .mouth { animation: mouth .16s infinite alternate; }
 .status-line { display: flex; justify-content: center; align-items: center; gap: 8px; color: #f4ecdc; font-size: 1.05rem; }.status-dot { width: 9px; height: 9px; border-radius: 50%; background: #7c776e; }.status-listening { background: #66b5d1; animation: pulse 1.2s infinite; }.status-thinking { background: var(--gold); animation: pulse 1.2s infinite; }.status-speaking { background: #9a83db; }.status-error { background: var(--danger); }.status-detail { color: var(--muted); margin: 6px auto 0; min-height: 1.5em; font-size: .88rem; }
 .conversation { display: grid; gap: 12px; margin-top: 12px; }.transcript-card, .message { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 15px; }.card-heading span { font-size: .78rem; color: var(--muted); }.interim-text { min-height: 28px; margin: 12px 0; color: #dbd3c7; line-height: 1.6; }.manual-input textarea { resize: vertical; min-height: 60px; }.manual-actions { justify-content: flex-end; margin-top: 7px; }.conversation-list { display: grid; gap: 9px; max-height: 360px; overflow: auto; scroll-behavior: smooth; }.message { background: #0e0e0d; }.message.user { border-left: 3px solid #6b95a8; }.message.assistant { border-left: 3px solid var(--gold); }.message-role { color: var(--gold); font-size: .75rem; letter-spacing: .08em; }.message p { margin: 7px 0 0; white-space: pre-wrap; line-height: 1.7; }.message-speak { margin-top: 11px; min-height: 40px; border: 1px solid #705a39; border-radius: 9px; padding: 7px 12px; color: var(--gold); background: #17130d; font-size: .84rem; }.message-speak:active { background: #2a2115; }
 .controls { padding: 18px 0 4px; }.primary-controls { justify-content: center; }.start-button { border-radius: 99px; min-width: min(72vw, 290px); min-height: 58px; font-size: 1.05rem; box-shadow: 0 0 0 6px rgba(214,172,101,.08); }.mic-icon { margin-right: 8px; font-size: .8rem; }.secondary-controls { justify-content: center; margin-top: 12px; flex-wrap: wrap; }.voice-settings { padding: 15px 0 5px; border-top: 1px solid var(--border); }.rate-field output { color: var(--gold); margin-left: 5px; }.rate-field input { padding: 0; min-height: 28px; accent-color: var(--gold); }
@@ -64,8 +67,9 @@ footer { border-top: 1px solid var(--border); display: flex; justify-content: sp
 
 /* The normal controls remain available in the DOM for accessibility and
    settings, while the default canvas is intentionally a focused avatar mode. */
-body.minimal-mode .topbar > div, body.minimal-mode .conversation, body.minimal-mode .voice-settings, body.minimal-mode .secondary-controls, body.minimal-mode .status-line, body.minimal-mode .status-detail, body.minimal-mode footer { display: none; }
+body.minimal-mode .topbar > div:not(.topbar-actions), body.minimal-mode .conversation, body.minimal-mode .voice-settings, body.minimal-mode .secondary-controls, body.minimal-mode .status-line, body.minimal-mode .status-detail, body.minimal-mode footer { display: none; }
 body.minimal-mode .topbar { min-height: 32px; justify-content: flex-end; }
+body.minimal-mode .topbar-actions { display: flex; }
 body.minimal-mode .topbar .icon-button { width: 34px; min-width: 34px; height: 34px; opacity: .35; font-size: 1rem; }
 body.minimal-mode .hero { padding-top: 0; }
 body.minimal-mode .avatar-stage { height: min(65svh, 560px); }
@@ -73,5 +77,6 @@ body.minimal-mode .controls { padding: 12px 0 max(18px, env(safe-area-inset-bott
 body.minimal-mode .primary-controls { justify-content: center; }
 body.minimal-mode #stop-button { display: none; }
 body.minimal-mode .start-button { min-width: min(82vw, 340px); min-height: 64px; }
-body.minimal-mode .interim-card { display: none; }
+body.minimal-mode .quick-menu .conversation { display: grid; }
+body.minimal-mode .quick-menu .voice-settings { display: grid; }
 body.minimal-mode .settings-panel:not([hidden]) { display: block; }

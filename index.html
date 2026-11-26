@@ -16,7 +16,10 @@
           <p class="eyebrow">SOCRATES VOICE AI</p>
           <h1>蘇格拉底語音對話</h1>
         </div>
-        <button class="icon-button" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel" title="開啟設定">⚙<span class="sr-only">開啟設定</span></button>
+        <div class="topbar-actions">
+          <button class="icon-button" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel" title="開啟 API 設定">⚙<span class="sr-only">開啟 API 設定</span></button>
+          <button class="icon-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="quick-menu" title="開啟聊天與語音選單"><span aria-hidden="true">☰</span><span class="sr-only">開啟聊天與語音選單</span></button>
+        </div>
       </header>
 
       <main>
@@ -67,28 +70,46 @@
           <p class="privacy-note">本頁是純前端網站，不會把 Key 寫入 URL、Git 或 console。只有勾選保存時才會放入瀏覽器 sessionStorage；清除瀏覽器資料即可移除。</p>
         </section>
 
+        <aside class="quick-menu" id="quick-menu" hidden aria-label="聊天與語音選單">
+          <div class="quick-menu-heading">
+            <div><p class="eyebrow">MENU</p><h2>聊天與語音</h2></div>
+            <button class="icon-button subtle" id="menu-close" type="button" title="關閉選單">×<span class="sr-only">關閉選單</span></button>
+          </div>
+          <section class="menu-section" aria-labelledby="menu-conversation-title">
+            <div class="menu-section-heading"><h2 id="menu-conversation-title">聊天文字記錄</h2><button class="small-button danger" id="menu-clear-conversation" type="button">清除</button></div>
+            <section class="conversation" aria-label="聊天文字記錄">
+              <div class="transcript-card">
+                <div class="card-heading"><h2>你說</h2><span id="interim-label">尚未開始</span></div>
+                <p class="interim-text" id="interim-text">點擊開始後，辨識中的文字會出現在這裡。</p>
+                <label class="manual-input"><span class="sr-only">手動輸入訊息</span><textarea id="manual-input" rows="2" maxlength="2000" placeholder="也可以直接輸入文字…"></textarea></label>
+                <div class="manual-actions"><button class="small-button" id="send-manual" type="button">送出文字</button></div>
+              </div>
+              <div class="conversation-list" id="conversation-list" aria-live="polite"></div>
+            </section>
+          </section>
+          <section class="menu-section" aria-labelledby="menu-voice-title">
+            <h2 id="menu-voice-title">語音設定</h2>
+            <section class="voice-settings" aria-label="語音選項">
+              <label class="field"><span>語言</span><select id="language"><option value="zh-TW">繁體中文（台灣）</option><option value="en-US">English（US）</option></select></label>
+              <label class="field"><span>朗讀聲音</span><select id="voice-select"><option value="">系統預設</option></select></label>
+              <label class="field rate-field"><span>朗讀速度 <output id="rate-value">0.9</output></span><input id="speech-rate" type="range" min="0.7" max="1.2" step="0.1" value="0.9" /></label>
+              <label class="field"><span>對話模式</span><select id="conversation-mode"><option value="socratic">蘇格拉底引導</option><option value="general">一般對話</option></select></label>
+            </section>
+          </section>
+        </aside>
+
         <section class="hero" aria-labelledby="status-label">
           <div class="avatar-stage" id="avatar-stage" data-state="idle">
             <div class="avatar-glow"></div>
-            <div class="socrates" aria-label="蘇格拉底卡通頭像" role="img">
+            <div class="socrates greek-woman" aria-label="希臘風格女性蘇格拉底式 AI 頭像" role="img">
               <div class="laurel laurel-left"></div><div class="laurel laurel-right"></div>
-              <div class="head"><div class="hair"></div><div class="brow brow-left"></div><div class="brow brow-right"></div><div class="eye eye-left"></div><div class="eye eye-right"></div><div class="nose"></div><div class="beard"></div><div class="mouth"></div></div>
-              <div class="shoulders"></div>
+              <div class="hair-back"></div><div class="shoulders"></div><div class="neck"></div>
+              <div class="head"><div class="hair"></div><div class="brow brow-left"></div><div class="brow brow-right"></div><div class="eye eye-left"></div><div class="eye eye-right"></div><div class="cheek cheek-left"></div><div class="cheek cheek-right"></div><div class="nose"></div><div class="mouth"></div></div>
             </div>
             <div class="avatar-caption" id="avatar-caption">待命</div>
           </div>
           <div class="status-line"><span class="status-dot" id="status-dot"></span><span id="status-label">待命</span></div>
           <p class="status-detail" id="status-detail">輸入 API Key 後，按住或點一下開始說話。</p>
-        </section>
-
-        <section class="conversation" aria-label="對話內容">
-          <div class="transcript-card">
-            <div class="card-heading"><h2>你說</h2><span id="interim-label">尚未開始</span></div>
-            <p class="interim-text" id="interim-text">點擊開始後，辨識中的文字會出現在這裡。</p>
-            <label class="manual-input"><span class="sr-only">手動輸入訊息</span><textarea id="manual-input" rows="2" maxlength="2000" placeholder="也可以直接輸入文字…"></textarea></label>
-            <div class="manual-actions"><button class="small-button" id="send-manual" type="button">送出文字</button></div>
-          </div>
-          <div class="conversation-list" id="conversation-list" aria-live="polite"></div>
         </section>
 
         <section class="controls" aria-label="語音控制">
@@ -102,13 +123,6 @@
             <button class="small-button" id="retry-button" type="button" hidden>重試</button>
             <button class="small-button danger" id="clear-conversation" type="button">清除對話</button>
           </div>
-        </section>
-
-        <section class="voice-settings" aria-label="語音選項">
-          <label class="field"><span>語言</span><select id="language"><option value="zh-TW">繁體中文（台灣）</option><option value="en-US">English（US）</option></select></label>
-          <label class="field"><span>朗讀聲音</span><select id="voice-select"><option value="">系統預設</option></select></label>
-          <label class="field rate-field"><span>朗讀速度 <output id="rate-value">0.9</output></span><input id="speech-rate" type="range" min="0.7" max="1.2" step="0.1" value="0.9" /></label>
-          <label class="field"><span>對話模式</span><select id="conversation-mode"><option value="socratic">蘇格拉底引導</option><option value="general">一般對話</option></select></label>
         </section>
 
         <aside class="consent" id="consent" hidden>
