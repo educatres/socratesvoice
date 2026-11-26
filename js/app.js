@@ -27,6 +27,7 @@ let lastPrompt = ''
 let autoListen = true
 let consentNeeded = !hasConsent()
 let voices = []
+let avatarRotation = 0
 const MAX_INPUT_LENGTH = 2000
 
 const avatar = createAvatar(el.avatarStage, el.avatarCaption)
@@ -240,12 +241,24 @@ async function loadAvatarAssets() {
 
 function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; el.replay.hidden = true; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
 
+function rotateAvatar(delta) {
+  avatarRotation = (avatarRotation + delta + 360) % 360
+  el.avatarStage.style.setProperty('--avatar-rotation', `${avatarRotation}deg`)
+  el.avatarStage.dataset.rotation = String(avatarRotation)
+}
+
+function handleAvatarRotation(event) {
+  if (event.defaultPrevented || event.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return
+  if (event.key === 'ArrowLeft') { event.preventDefault(); rotateAvatar(-90) }
+  else if (event.key === 'ArrowRight') { event.preventDefault(); rotateAvatar(90) }
+}
+
 function setupEvents() {
   el.settingsToggle.addEventListener('click', () => el.settingsPanel.hidden ? openSettings() : closeSettings()); el.settingsClose.addEventListener('click', closeSettings); el.menuToggle.addEventListener('click', () => el.menu.hidden ? openMenu() : closeMenu()); el.menuClose.addEventListener('click', closeMenu)
   el.provider.addEventListener('change', (event) => selectProvider(event.target.value)); el.key.addEventListener('input', () => { settings = { ...settings, apiKey: el.key.value }; models = []; showModels(''); persist() }); el.toggleKey.addEventListener('click', () => { const visible = el.key.type === 'text'; el.key.type = visible ? 'password' : 'text'; el.toggleKey.textContent = visible ? '顯示' : '隱藏' }); el.clearKey.addEventListener('click', () => { clearStoredKey(settings.provider); settings = { ...settings, apiKey: '', rememberKey: false }; el.key.value = ''; el.remember.checked = false; persist(); showModels('已清除目前 Provider 的 API Key。') }); el.remember.addEventListener('change', () => { settings = { ...settings, rememberKey: el.remember.checked }; persist() }); el.base.addEventListener('change', () => { settings = { ...settings, baseUrl: el.base.value.trim() }; persist() }); el.model.addEventListener('input', () => { settings = { ...settings, modelId: el.model.value.trim() }; persist() }); el.reasoning.addEventListener('change', () => { settings = { ...settings, reasoningEffort: el.reasoning.value }; persist() }); el.testProvider.addEventListener('click', testProvider); el.testConnection.addEventListener('click', testConnection)
   el.language.addEventListener('change', () => { settings = { ...settings, language: el.language.value, voiceName: '' }; persist(); populateVoices() }); el.voice.addEventListener('change', () => { settings = { ...settings, voiceName: el.voice.value }; persist() }); el.rate.addEventListener('input', () => { settings = { ...settings, rate: Number(el.rate.value) }; el.rateValue.value = el.rate.value; persist() }); el.mode.addEventListener('change', () => { settings = { ...settings, mode: el.mode.value }; avatar.setVariant(settings.mode); persist() }); el.character.addEventListener('change', () => { settings = { ...settings, character: el.character.value }; avatar.setCharacter(settings.character); persist() })
   el.start.addEventListener('click', primaryAction); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按「重新朗讀」或開始說話繼續。') }); el.replay.addEventListener('click', replayLastReply); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.menuClearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { if (state.state === STATES.SPEAKING) speaker.stop(); primeSpeechSynthesis(settings.language); populateVoices(); state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
-  el.consentAccept.addEventListener('click', () => { saveConsent(); consentNeeded = false; el.consent.hidden = true; beginListening(false) }); window.speechSynthesis?.addEventListener?.('voiceschanged', populateVoices); document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && (state.state === STATES.LISTENING || state.state === STATES.SPEAKING || state.state === STATES.THINKING)) stopAll() })
+  el.consentAccept.addEventListener('click', () => { saveConsent(); consentNeeded = false; el.consent.hidden = true; beginListening(false) }); window.addEventListener('keydown', handleAvatarRotation); window.speechSynthesis?.addEventListener?.('voiceschanged', populateVoices); document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && (state.state === STATES.LISTENING || state.state === STATES.SPEAKING || state.state === STATES.THINKING)) stopAll() })
 }
 
 document.body.classList.add('minimal-mode')
