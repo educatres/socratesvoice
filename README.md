@@ -11,6 +11,7 @@
 - 參考專案相同的 Provider 體驗：OpenAI、Grok（xAI）、Google AI Studio、CGU；每家可設定 API Key、Base URL、模型 ID，並測試 Key／讀取模型／測試生成。
 - Google AI Studio 同時支援原生 Gemini `generateContent` 與 OpenAI 相容 `/chat/completions` endpoint。
 - API 請求 45 秒逾時、AbortController 取消、429／401／403／404／5xx／CORS 可理解錯誤。
+- iOS Safari 朗讀預熱：開始說話／送出文字時先以無聲 utterance 解鎖 speech queue；若自動朗讀被瀏覽器攔截，可點「重新朗讀」以使用者手勢再次觸發。
 - 最近 10 輪對話（最多 20 則訊息）；蘇格拉底模式及一般對話模式。
 - API Key 預設只在記憶體；只有使用者勾選保存時才寫入 `sessionStorage`，永不使用 `localStorage` 保存 Key。其他 UI 設定可保存在 localStorage。
 - 首次使用的語音／資料外送告知；頁面離開前景會停止收音、朗讀與模型請求。
@@ -54,3 +55,5 @@ Google AI Studio 預設使用 `gemini-flash-lite-latest`。原生 Google endpoin
 純前端無法完全保護瀏覽器中的秘密；請替 API Key 設定來源限制、配額與費用監控。語音辨識可能由 Apple／瀏覽器遠端服務處理；對話文字會送往你選定的模型服務。本專案不主動錄音、不使用追蹤器、不把 Key 寫入 URL、console、錯誤訊息或匯出資料。
 
 iOS Safari 的麥克風權限、自動續聽、TTS voices、背景／鎖屏行為必須在實機驗證。規格要求的 10 輪連續對話、實際 Gemini 配額及各 Provider CORS 未在此環境宣稱已通過；若 Safari 拒絕自動重啟，介面會切換為「點一下繼續」。
+
+若看得到 AI 回覆但沒有聲音，先確認手機不是靜音模式、媒體音量已開啟，接著按「重新朗讀」；Safari 可能需要這個明確的使用者手勢才允許朗讀。
