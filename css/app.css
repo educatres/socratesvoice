@@ -77,11 +77,15 @@ body.minimal-mode .topbar-actions { display: flex; }
 body.minimal-mode .topbar .icon-button { width: 34px; min-width: 34px; height: 34px; opacity: .35; font-size: 1rem; }
 body.minimal-mode .hero { padding-top: 0; }
 body.minimal-mode .avatar-stage { height: min(65svh, 560px); }
+body.minimal-mode .avatar-caption { display: none; }
 body.minimal-mode .controls { padding: 12px 0 max(18px, env(safe-area-inset-bottom)); }
 body.minimal-mode .primary-controls { justify-content: center; }
-body.minimal-mode #stop-button { display: none; }
-body.minimal-mode .start-button { min-width: min(58vw, 240px); width: auto; min-height: 58px; padding-inline: 24px; color: #f9eee4; background: #4a2b20; border-color: #81533d; box-shadow: 0 0 0 6px rgba(74,43,32,.16); }
+body.minimal-mode .start-button, body.minimal-mode .stop-button { display: inline-grid; place-items: center; width: 72px; height: 72px; min-width: 72px; min-height: 72px; padding: 0; }
+body.minimal-mode .start-button { border-radius: 50%; color: #f9eee4; background: #4a2b20; border-color: #81533d; box-shadow: 0 0 0 6px rgba(74,43,32,.16); }
 body.minimal-mode .start-button:active { background: #351d16; }
+body.minimal-mode .stop-button { border: 2px solid #81533d; border-radius: 16px; color: #f9eee4; background: #4a2b20; box-shadow: 0 0 0 6px rgba(74,43,32,.1); }
+body.minimal-mode .stop-button:active { background: #351d16; }
+body.minimal-mode .start-button[hidden], body.minimal-mode .stop-button[hidden] { display: none !important; }
 body.minimal-mode .quick-menu .conversation { display: grid; }
 body.minimal-mode .quick-menu .voice-settings { display: grid; }
 body.minimal-mode .settings-panel:not([hidden]) { display: block; }

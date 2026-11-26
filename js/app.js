@@ -9,7 +9,7 @@ import { createAvatarPlayer } from '../avatar/avatar-player.js'
 const $ = (id) => document.getElementById(id)
 const el = {
   settingsToggle: $('settings-toggle'), settingsPanel: $('settings-panel'), settingsClose: $('settings-close'), menuToggle: $('menu-toggle'), menu: $('quick-menu'), menuClose: $('menu-close'), menuClearConversation: $('menu-clear-conversation'), provider: $('provider-select'), key: $('api-key'), toggleKey: $('toggle-key'), clearKey: $('clear-key'), remember: $('remember-key'), base: $('base-url'), model: $('model-id'), reasoning: $('reasoning-effort'), providerHint: $('provider-hint'), keyHint: $('key-hint'), testProvider: $('test-provider'), testConnection: $('test-connection'), modelResults: $('model-results'),
-  avatarStage: $('avatar-stage'), avatarImage: $('avatar-image'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), replay: $('replay-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), rateValue: $('rate-value'), mode: $('conversation-mode'), consent: $('consent'), consentAccept: $('consent-accept'),
+  avatarStage: $('avatar-stage'), avatarImage: $('avatar-image'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), replay: $('replay-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), mode: $('conversation-mode'), character: $('avatar-character'), rateValue: $('rate-value'), consent: $('consent'), consentAccept: $('consent-accept'),
 }
 
 const stateLabels = { idle: ['待命', '輸入 API Key 後，按一下開始說話。'], listening: ['聆聽中', '請說話；辨識完成後會送出這一輪內容。'], thinking: ['思考中', '正在將你的話交給模型，請稍候。'], speaking: ['說話中', 'AI 正在朗讀回覆；此時不會啟動麥克風。'], 'await-tap': ['點一下繼續', '自動續聽受到瀏覽器限制，請按開始說話。'], error: ['錯誤', '請檢查設定或重試。'] }
@@ -38,8 +38,11 @@ const state = new ConversationState((next, detail) => {
   avatar.setState(next)
   el.statusDot.className = `status-dot status-${next}`
   el.start.disabled = next === STATES.THINKING
-  el.stop.disabled = true
-  el.startLabel.textContent = next === STATES.LISTENING ? '停止收音' : next === STATES.SPEAKING ? '朗讀中…' : '開始收音'
+  el.start.hidden = next === STATES.LISTENING
+  el.stop.hidden = next !== STATES.LISTENING
+  el.stop.disabled = next !== STATES.LISTENING
+  el.start.setAttribute('aria-label', next === STATES.SPEAKING ? '朗讀中' : '開始收音')
+  el.start.title = next === STATES.SPEAKING ? '朗讀中' : '開始收音'
   if (next === STATES.ERROR) el.retry.hidden = false
   else if (next !== STATES.THINKING) el.retry.hidden = true
 })
@@ -60,7 +63,7 @@ function renderProviderOptions() {
 
 function updateSettingsForm() {
   const provider = providerFor(settings.provider)
-  el.provider.value = settings.provider; el.key.value = settings.apiKey; el.remember.checked = settings.rememberKey; el.base.value = settings.baseUrl; el.model.value = settings.modelId; el.language.value = settings.language; el.voice.value = settings.voiceName; el.rate.value = settings.rate; el.rateValue.value = settings.rate; el.mode.value = settings.mode; el.reasoning.value = settings.reasoningEffort; el.providerHint.textContent = provider.hint
+  el.provider.value = settings.provider; el.key.value = settings.apiKey; el.remember.checked = settings.rememberKey; el.base.value = settings.baseUrl; el.model.value = settings.modelId; el.language.value = settings.language; el.voice.value = settings.voiceName; el.rate.value = settings.rate; el.rateValue.value = settings.rate; el.mode.value = settings.mode; el.character.value = settings.character; el.reasoning.value = settings.reasoningEffort; el.providerHint.textContent = provider.hint
   el.keyHint.textContent = settings.provider === 'google' ? 'Google 原生 endpoint 使用 x-goog-api-key header；OpenAI 相容 endpoint 使用 Authorization header。' : 'Key 僅用於目前瀏覽器工作階段，不會寫入 URL 或 console。'
   el.reasoning.closest('.field').hidden = settings.provider !== 'cgu'
 }
@@ -222,6 +225,7 @@ async function loadAvatarAssets() {
   try {
     const player = await createAvatarPlayer(el.avatarImage, {
       manifestUrl: './avatar/manifest.json',
+      character: settings.character,
       mode: settings.mode === 'general' ? 'modern' : 'socrates',
       state: 'idle',
       format: 'webp',
@@ -239,13 +243,13 @@ function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; e
 function setupEvents() {
   el.settingsToggle.addEventListener('click', () => el.settingsPanel.hidden ? openSettings() : closeSettings()); el.settingsClose.addEventListener('click', closeSettings); el.menuToggle.addEventListener('click', () => el.menu.hidden ? openMenu() : closeMenu()); el.menuClose.addEventListener('click', closeMenu)
   el.provider.addEventListener('change', (event) => selectProvider(event.target.value)); el.key.addEventListener('input', () => { settings = { ...settings, apiKey: el.key.value }; models = []; showModels(''); persist() }); el.toggleKey.addEventListener('click', () => { const visible = el.key.type === 'text'; el.key.type = visible ? 'password' : 'text'; el.toggleKey.textContent = visible ? '顯示' : '隱藏' }); el.clearKey.addEventListener('click', () => { clearStoredKey(settings.provider); settings = { ...settings, apiKey: '', rememberKey: false }; el.key.value = ''; el.remember.checked = false; persist(); showModels('已清除目前 Provider 的 API Key。') }); el.remember.addEventListener('change', () => { settings = { ...settings, rememberKey: el.remember.checked }; persist() }); el.base.addEventListener('change', () => { settings = { ...settings, baseUrl: el.base.value.trim() }; persist() }); el.model.addEventListener('input', () => { settings = { ...settings, modelId: el.model.value.trim() }; persist() }); el.reasoning.addEventListener('change', () => { settings = { ...settings, reasoningEffort: el.reasoning.value }; persist() }); el.testProvider.addEventListener('click', testProvider); el.testConnection.addEventListener('click', testConnection)
-  el.language.addEventListener('change', () => { settings = { ...settings, language: el.language.value, voiceName: '' }; persist(); populateVoices() }); el.voice.addEventListener('change', () => { settings = { ...settings, voiceName: el.voice.value }; persist() }); el.rate.addEventListener('input', () => { settings = { ...settings, rate: Number(el.rate.value) }; el.rateValue.value = el.rate.value; persist() }); el.mode.addEventListener('change', () => { settings = { ...settings, mode: el.mode.value }; avatar.setVariant(settings.mode); persist() })
+  el.language.addEventListener('change', () => { settings = { ...settings, language: el.language.value, voiceName: '' }; persist(); populateVoices() }); el.voice.addEventListener('change', () => { settings = { ...settings, voiceName: el.voice.value }; persist() }); el.rate.addEventListener('input', () => { settings = { ...settings, rate: Number(el.rate.value) }; el.rateValue.value = el.rate.value; persist() }); el.mode.addEventListener('change', () => { settings = { ...settings, mode: el.mode.value }; avatar.setVariant(settings.mode); persist() }); el.character.addEventListener('change', () => { settings = { ...settings, character: el.character.value }; avatar.setCharacter(settings.character); persist() })
   el.start.addEventListener('click', primaryAction); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按「重新朗讀」或開始說話繼續。') }); el.replay.addEventListener('click', replayLastReply); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.menuClearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { if (state.state === STATES.SPEAKING) speaker.stop(); primeSpeechSynthesis(settings.language); populateVoices(); state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
   el.consentAccept.addEventListener('click', () => { saveConsent(); consentNeeded = false; el.consent.hidden = true; beginListening(false) }); window.speechSynthesis?.addEventListener?.('voiceschanged', populateVoices); document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && (state.state === STATES.LISTENING || state.state === STATES.SPEAKING || state.state === STATES.THINKING)) stopAll() })
 }
 
 document.body.classList.add('minimal-mode')
-renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); avatar.setVariant(settings.mode); avatar.start(); state.set(STATES.IDLE); loadAvatarAssets()
+renderProviderOptions(); updateSettingsForm(); populateVoices(); setupEvents(); avatar.setCharacter(settings.character); avatar.setVariant(settings.mode); avatar.start(); state.set(STATES.IDLE); loadAvatarAssets()
 if (!recognitionSupported()) el.statusDetail.textContent = '此瀏覽器不支援語音辨識，仍可使用下方文字輸入。'
 if (consentNeeded) el.consent.hidden = false
 if (!settings.apiKey) openSettings()

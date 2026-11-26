@@ -1,52 +1,68 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>蘇格拉底語音角色：分切影格預覽</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>語音 AI 虛擬角色素材｜人物＋白貓</title>
   <style>
-    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", system-ui, sans-serif; }
-    body { background:#141416; color:#fff; margin:0; padding:24px; display:grid; justify-items:center; gap:16px; }
-    h1 { font-size:1.3rem; margin:0; }
-    .stage { width:min(80vw,360px); aspect-ratio:1/1; background:#000; display:grid; place-items:center; overflow:hidden; border-radius:16px; }
-    .avatar { width:100%; height:100%; object-fit:contain; background:#000; animation:sway 7s ease-in-out infinite alternate; }
-    @keyframes sway { from{transform:rotate(-.65deg) translateY(1px)} to{transform:rotate(.65deg) translateY(-2px)} }
-    @media (prefers-reduced-motion:reduce){.avatar{animation:none}}
-    .controls{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
-    button {font:inherit; padding:10px 15px; border:1px solid #777; background:#25252b; color:white; border-radius:8px;}
-    button[aria-pressed="true"] { background:#53407c; border-color:#ad90ff; }
-    p { color:#ccc; max-width:700px; text-align:center; line-height:1.7; }
-    #status{font-size:.9rem;color:#ffcf83;min-height:20px}
+    :root { color-scheme: dark; font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",system-ui,sans-serif; }
+    * { box-sizing:border-box; }
+    body { background:#101015; color:#fff; margin:0; padding:20px 12px 32px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+    h1 { font-size:clamp(1.25rem,4vw,1.7rem); margin:0; text-align:center; }
+    .frame { background:#000; width:min(82vw,350px); aspect-ratio:1; overflow:hidden; display:grid; place-items:center; border-radius:15px; }
+    img { width:100%; height:100%; object-fit:contain; background:#000; animation:float 7s ease-in-out infinite alternate; }
+    @keyframes float { from { transform:translateY(1px) rotate(-.5deg); } to { transform:translateY(-1px) rotate(.5deg); } }
+    @media (prefers-reduced-motion:reduce) { img { animation:none; } }
+    .controls { display:flex; flex-direction:column; gap:7px; width:min(580px,100%); }
+    .controls strong { color:#d7d0e9; font-size:.92rem; }
+    .choices { display:flex; flex-wrap:wrap; gap:7px; }
+    button { border:1px solid #888; background:#27272e; padding:11px 15px; border-radius:9px; color:#fff; font:inherit; cursor:pointer; }
+    button[aria-pressed="true"] { background:#564075; border-color:#c59aff; }
+    p { color:#c4c4cc; font-size:.9rem; text-align:center; line-height:1.6; max-width:580px; margin:0; }
+    #status {color:#ffcf83;min-height:20px;}
   </style>
 </head>
 <body>
-  <h1>AI 語音角色動畫影格預覽</h1>
-  <div class="stage"><img id="avatar" class="avatar" src="" alt="角色動畫" /></div>
-  <div class="controls" id="modes">
-    <button type="button" data-mode="modern" aria-pressed="true">一般模式</button>
-    <button type="button" data-mode="socrates" aria-pressed="false">蘇格拉底模式</button>
+  <h1>AI 語音角色動畫：人物／白貓</h1>
+  <div class="frame"><img id="avatar" alt="動畫角色" width="512" height="512"></div>
+  <div class="controls">
+    <strong>選擇角色</strong>
+    <div class="choices" id="characters">
+      <button data-character="human" aria-pressed="true">短髮女性（約 40 歲）</button>
+      <button data-character="cat" aria-pressed="false">白貓</button>
+    </div>
   </div>
-  <div class="controls" id="states">
-    <button type="button" data-state="idle" aria-pressed="true">待機・眨眼</button>
-    <button type="button" data-state="speaking" aria-pressed="false">說話・嘴形</button>
-    <button type="button" data-state="thinking" aria-pressed="false">思考・提問</button>
+  <div class="controls">
+    <strong>選擇外觀</strong>
+    <div class="choices" id="modes">
+      <button data-mode="modern" aria-pressed="true">一般模式</button>
+      <button data-mode="socrates" aria-pressed="false">希臘／蘇格拉底模式（麥穗）</button>
+    </div>
   </div>
-  <p>這只是角色素材預覽，不包含語音辨識、LLM 或 TTS。正式專案請在開始朗讀時切換 speaking，結束時切回 idle。</p>
-  <div id="status"></div>
+  <div class="controls">
+    <strong>選擇動作</strong>
+    <div class="choices" id="states">
+      <button data-state="idle" aria-pressed="true">待機・眨眼</button>
+      <button data-state="speaking" aria-pressed="false">說話・嘴形</button>
+      <button data-state="thinking" aria-pressed="false">思考・提問</button>
+    </div>
+  </div>
+  <p>預覽頁不包含語音辨識、LLM 或文字轉語音。實際專案應由語音播放狀態驅動嘴形動畫。所有圖檔為純黑背景。</p>
+  <div id="status" role="status"></div>
   <script type="module">
-    import { createAvatarPlayer } from './avatar-player.js';
-    const status = document.getElementById('status');
+    import {createAvatarPlayer} from './avatar-player.js';
+    const status = document.querySelector('#status');
     try {
-      const player = await createAvatarPlayer(document.getElementById('avatar'));
-      document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{
-        player.setMode(b.dataset.mode);
-        document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
-      }));
-      document.querySelectorAll('[data-state]').forEach(b=>b.addEventListener('click',()=>{
-        player.setState(b.dataset.state);
-        document.querySelectorAll('[data-state]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
-      }));
-    } catch (err) { status.textContent = err.message + '（請用 HTTP(S) 伺服器開啟，勿直接雙擊本機檔案）'; }
+      const avatar = await createAvatarPlayer(document.querySelector('#avatar'), {manifestUrl:'./manifest.json'});
+      for (const attr of ['character','mode','state']) {
+        document.querySelectorAll(`[data-${attr}]`).forEach(button => button.addEventListener('click', () => {
+          const value=button.dataset[attr];
+          const fn = 'set' + attr.charAt(0).toUpperCase() + attr.slice(1);
+          avatar[fn](value);
+          document.querySelectorAll(`[data-${attr}]`).forEach(x => x.setAttribute('aria-pressed',String(x===button)));
+        }));
+      }
+    } catch (e) { status.textContent=`載入失敗：${e.message}。請以本地 HTTP 或 GitHub Pages 開啟，不可用 file://。`; }
   </script>
 </body>
 </html>

@@ -4,6 +4,7 @@ export function createAvatar(stage, caption) {
   let activeAction = ''
   let player = null
   let currentVariant = 'socrates'
+  let currentCharacter = 'human'
   let currentState = 'idle'
   const actions = [
     ['face-blink', 180], ['face-blink', 220], ['face-brow', 650],
@@ -28,6 +29,7 @@ export function createAvatar(stage, caption) {
   return {
     setPlayer(nextPlayer) {
       player = nextPlayer
+      player.setCharacter?.(currentCharacter)
       if (currentVariant) player.setMode(currentVariant === 'general' ? 'modern' : 'socrates')
       player.setState(currentState)
       window.clearTimeout(timer)
@@ -47,6 +49,13 @@ export function createAvatar(stage, caption) {
       stage.dataset.variant = general ? 'general' : 'socratic'
       stage.querySelector('.socrates')?.setAttribute('aria-label', general ? '黑白現代風格女性 AI 頭像' : '希臘風格女性蘇格拉底式 AI 頭像')
       player?.setMode(currentVariant === 'general' ? 'modern' : 'socrates')
+    },
+    setCharacter(character) {
+      currentCharacter = character === 'cat' ? 'cat' : 'human'
+      stage.dataset.character = currentCharacter
+      const label = currentCharacter === 'cat' ? '白貓' : '女性'
+      stage.querySelector('.socrates')?.setAttribute('aria-label', `${label} AI 頭像`)
+      player?.setCharacter?.(currentCharacter)
     },
     start() { if (!timer && !activeAction) schedule() },
     stop() { window.clearTimeout(timer); timer = 0; if (activeAction) stage.classList.remove(activeAction); activeAction = '' },

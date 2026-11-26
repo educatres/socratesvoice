@@ -7,7 +7,7 @@
     <meta name="description" content="以語音與蘇格拉底式 AI 對話的純前端工具" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'self' https://api.openai.com https://api.x.ai https://generativelanguage.googleapis.com https://air.cgu.edu.tw; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
     <title>Socrates Voice AI｜蘇格拉底語音 AI</title>
-    <link rel="stylesheet" href="./css/app.css?v=avatar-size-20261126" />
+    <link rel="stylesheet" href="./css/app.css?v=whitecat-controls-20261126" />
   </head>
   <body>
     <div class="app-shell">
@@ -93,6 +93,7 @@
               <label class="field"><span>語言</span><select id="language"><option value="zh-TW">繁體中文（台灣）</option><option value="en-US">English（US）</option></select></label>
               <label class="field"><span>朗讀聲音</span><select id="voice-select"><option value="">系統預設</option></select></label>
               <label class="field rate-field"><span>朗讀速度 <output id="rate-value">0.9</output></span><input id="speech-rate" type="range" min="0.7" max="1.2" step="0.1" value="0.9" /></label>
+              <label class="field"><span>人物角色</span><select id="avatar-character"><option value="human">短髮女性</option><option value="cat">白貓</option></select></label>
               <label class="field"><span>對話模式</span><select id="conversation-mode"><option value="socratic">蘇格拉底引導</option><option value="general">一般對話</option></select></label>
             </section>
           </section>
@@ -115,8 +116,8 @@
 
         <section class="controls" aria-label="語音控制">
           <div class="primary-controls">
-            <button class="start-button" id="start-button" type="button"><span class="mic-icon">●</span><span id="start-label">開始收音</span></button>
-            <button class="button secondary" id="stop-button" type="button" disabled>停止</button>
+            <button class="start-button" id="start-button" type="button" aria-label="開始收音" title="開始收音"><span id="start-label" class="sr-only">開始收音</span></button>
+            <button class="stop-button" id="stop-button" type="button" aria-label="停止收音" title="停止收音" hidden disabled><span class="sr-only">停止收音</span></button>
           </div>
           <div class="secondary-controls">
             <button class="small-button" id="stop-speaking" type="button">停止朗讀</button>
@@ -135,6 +136,6 @@
 
       <footer><span>純前端・API Key 由你自行管理</span><a href="./Socrates_Voice_AI_Spec.md" target="_blank" rel="noreferrer">開發規格</a></footer>
     </div>
-    <script type="module" src="./js/app.js?v=avatar-size-20261126"></script>
+    <script type="module" src="./js/app.js?v=whitecat-controls-20261126"></script>
   </body>
 </html>

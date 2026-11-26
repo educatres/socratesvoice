@@ -43,6 +43,7 @@ export function loadSettings() {
     voiceName: typeof saved.voiceName === 'string' ? saved.voiceName : '',
     rate: Number.isFinite(saved.rate) ? Math.min(1.2, Math.max(0.7, saved.rate)) : 0.9,
     mode: saved.mode === 'general' ? 'general' : 'socratic',
+    character: saved.character === 'cat' ? 'cat' : 'human',
     reasoningEffort: ['low', 'medium', 'high'].includes(saved.reasoningEffort) ? saved.reasoningEffort : 'medium',
   }
 }
@@ -51,7 +52,7 @@ export function saveSettings(settings) {
   const safe = {
     provider: settings.provider, baseUrl: settings.baseUrl, modelId: settings.modelId,
     rememberKey: settings.rememberKey, language: settings.language, voiceName: settings.voiceName,
-    rate: settings.rate, mode: settings.mode, reasoningEffort: settings.reasoningEffort,
+    rate: settings.rate, mode: settings.mode, character: settings.character, reasoningEffort: settings.reasoningEffort,
   }
   try { window.localStorage.setItem(CONFIG_KEY, JSON.stringify(safe)) } catch { /* private mode: memory only */ }
   try {
