@@ -16,6 +16,31 @@ export function splitSpeech(value, maxLength = 180) {
   return chunks
 }
 
+export function speechSynthesisSupported() {
+  return typeof window !== 'undefined' && Boolean(window.speechSynthesis) && typeof SpeechSynthesisUtterance !== 'undefined'
+}
+
+/**
+ * iOS Safari may ignore the first speech request if it happens after an async
+ * fetch. Calling this from a user gesture unlocks the speech queue. The
+ * zero-volume utterance is intentionally silent and has no application text.
+ */
+export function primeSpeechSynthesis(lang = 'zh-TW') {
+  if (!speechSynthesisSupported()) return false
+  const synthesis = window.speechSynthesis
+  try {
+    synthesis.resume?.()
+    const unlock = new SpeechSynthesisUtterance('\u200b')
+    unlock.lang = lang
+    unlock.volume = 0
+    unlock.rate = 10
+    synthesis.speak(unlock)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function createSpeaker({ getVoice, getRate, getLang, onStart, onEnd, onError }) {
   let stopped = false
   let queue = []
@@ -28,6 +53,7 @@ export function createSpeaker({ getVoice, getRate, getLang, onStart, onEnd, onEr
     const utterance = new SpeechSynthesisUtterance(queue[index])
     utterance.lang = getLang()
     utterance.rate = getRate()
+    utterance.volume = 1
     const voice = getVoice()
     if (voice) utterance.voice = voice
     utterance.onstart = () => { if (currentRun === runId && index === 0) onStart?.() }
@@ -36,7 +62,7 @@ export function createSpeaker({ getVoice, getRate, getLang, onStart, onEnd, onEr
     window.speechSynthesis.speak(utterance)
   }
   return {
-    speak(text) { runId += 1; const currentRun = runId; stopped = false; queue = splitSpeech(text); index = 0; if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') { onError?.('unsupported'); return } window.clearTimeout(watchdog); watchdog = window.setTimeout(() => { if (currentRun === runId) { stopped = true; window.speechSynthesis.cancel(); onError?.('speech-timeout') } }, Math.max(12000, queue.join('').length * 220)); if (queue.length) speakNext(currentRun); else onEnd?.() },
+    speak(text) { runId += 1; const currentRun = runId; stopped = false; queue = splitSpeech(text); index = 0; if (!speechSynthesisSupported()) { onError?.('unsupported'); return } window.speechSynthesis.resume?.(); window.clearTimeout(watchdog); watchdog = window.setTimeout(() => { if (currentRun === runId) { stopped = true; window.speechSynthesis.cancel(); onError?.('speech-timeout') } }, Math.max(12000, queue.join('').length * 220)); if (queue.length) speakNext(currentRun); else onEnd?.() },
     stop() { runId += 1; stopped = true; queue = []; index = 0; window.clearTimeout(watchdog); window.speechSynthesis?.cancel?.() },
   }
 }

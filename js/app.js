@@ -3,18 +3,19 @@ import { defaultModel, generateReply, listModels, providerLabel } from './gemini
 import { PROVIDERS, clearStoredKey, hasConsent, loadSettings, providerFor, saveConsent, saveSettings, storedApiKey } from './settings.js'
 import { ConversationState, STATES } from './state-machine.js'
 import { createRecognition, recognitionSupported } from './speech-recognition.js'
-import { createSpeaker } from './speech-synthesis.js'
+import { createSpeaker, primeSpeechSynthesis } from './speech-synthesis.js'
 
 const $ = (id) => document.getElementById(id)
 const el = {
   settingsToggle: $('settings-toggle'), settingsPanel: $('settings-panel'), settingsClose: $('settings-close'), provider: $('provider-select'), key: $('api-key'), toggleKey: $('toggle-key'), clearKey: $('clear-key'), remember: $('remember-key'), base: $('base-url'), model: $('model-id'), reasoning: $('reasoning-effort'), providerHint: $('provider-hint'), keyHint: $('key-hint'), testProvider: $('test-provider'), testConnection: $('test-connection'), modelResults: $('model-results'),
-  avatarStage: $('avatar-stage'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), rateValue: $('rate-value'), mode: $('conversation-mode'), consent: $('consent'), consentAccept: $('consent-accept'),
+  avatarStage: $('avatar-stage'), avatarCaption: $('avatar-caption'), statusDot: $('status-dot'), statusLabel: $('status-label'), statusDetail: $('status-detail'), interimLabel: $('interim-label'), interim: $('interim-text'), manual: $('manual-input'), sendManual: $('send-manual'), conversation: $('conversation-list'), start: $('start-button'), startLabel: $('start-label'), stop: $('stop-button'), stopSpeaking: $('stop-speaking'), replay: $('replay-speaking'), retry: $('retry-button'), clearConversation: $('clear-conversation'), language: $('language'), voice: $('voice-select'), rate: $('speech-rate'), rateValue: $('rate-value'), mode: $('conversation-mode'), consent: $('consent'), consentAccept: $('consent-accept'),
 }
 
 const stateLabels = { idle: ['待命', '輸入 API Key 後，按一下開始說話。'], listening: ['聆聽中', '請說話；辨識完成後會送出這一輪內容。'], thinking: ['思考中', '正在將你的話交給模型，請稍候。'], speaking: ['說話中', 'AI 正在朗讀回覆；此時不會啟動麥克風。'], 'await-tap': ['點一下繼續', '自動續聽受到瀏覽器限制，請按開始說話。'], error: ['錯誤', '請檢查設定或重試。'] }
 let settings = loadSettings()
 let models = []
 let messages = []
+let lastReply = ''
 let pendingText = ''
 let recognition = null
 let recognitionEnded = false
@@ -90,7 +91,7 @@ function populateVoices() {
 }
 
 function getVoice() { return voices.find((voice) => voice.name === settings.voiceName) || null }
-const speaker = createSpeaker({ getVoice, getRate: () => Number(settings.rate), getLang: () => settings.language, onStart: () => state.set(STATES.SPEAKING), onEnd: () => onSpeechEnd(), onError: () => { state.set(STATES.AWAIT_TAP, '朗讀遇到瀏覽器限制，仍可閱讀文字；請按開始說話。') } })
+const speaker = createSpeaker({ getVoice, getRate: () => Number(settings.rate), getLang: () => settings.language, onStart: () => state.set(STATES.SPEAKING), onEnd: () => onSpeechEnd(), onError: (reason) => { if (lastReply) el.replay.hidden = false; state.set(STATES.AWAIT_TAP, reason === 'unsupported' ? '此瀏覽器不支援朗讀，仍可閱讀文字。' : '朗讀遇到瀏覽器限制；請按「重新朗讀」或按開始說話。') } })
 
 function onSpeechEnd() {
   if (state.state !== STATES.SPEAKING) return
@@ -124,6 +125,10 @@ function finishListening(session, turn) {
 }
 
 function beginListening(isAuto = false) {
+  if (!isAuto) {
+    primeSpeechSynthesis(settings.language)
+    populateVoices()
+  }
   if (consentNeeded) { el.consent.hidden = false; return }
   if (!settings.apiKey.trim()) { openSettings(true); setStatusError('請先輸入 API Key，再開始語音對話。'); return }
   if (!recognitionSupported()) { state.set(STATES.AWAIT_TAP, '此瀏覽器不支援語音辨識，請在下方文字框輸入訊息。'); el.manual.focus(); return }
@@ -147,7 +152,7 @@ async function submitText(text, session = state.session, turn = state.nextTurn()
   try {
     const reply = await generateReply(config(), messages, { language: settings.language, mode: settings.mode, signal: activeAbort.signal })
     if (!state.isCurrent(session, turn)) return
-    messages = [...messages, { role: 'assistant', content: reply }].slice(-20); renderConversation(); state.set(STATES.SPEAKING); speaker.speak(reply)
+    messages = [...messages, { role: 'assistant', content: reply }].slice(-20); lastReply = reply; el.replay.hidden = false; renderConversation(); state.set(STATES.SPEAKING); speaker.speak(reply)
   } catch (error) {
     if (!state.isCurrent(session, turn)) return
     const message = error instanceof Error ? error.message : '模型請求失敗。'
@@ -177,13 +182,15 @@ async function testConnection() {
   finally { el.testConnection.disabled = false }
 }
 
-function clearConversation() { messages = []; lastPrompt = ''; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
+function replayLastReply() { if (!lastReply) return; primeSpeechSynthesis(settings.language); populateVoices(); autoListen = false; state.set(STATES.SPEAKING, '正在重新朗讀上一則回覆。'); speaker.speak(lastReply) }
+
+function clearConversation() { messages = []; lastPrompt = ''; lastReply = ''; el.replay.hidden = true; renderConversation(); el.interim.textContent = '對話已清除。'; el.interimLabel.textContent = '尚未開始'; stopAll() }
 
 function setupEvents() {
   el.settingsToggle.addEventListener('click', () => el.settingsPanel.hidden ? openSettings() : closeSettings()); el.settingsClose.addEventListener('click', closeSettings)
   el.provider.addEventListener('change', (event) => selectProvider(event.target.value)); el.key.addEventListener('input', () => { settings = { ...settings, apiKey: el.key.value }; models = []; showModels(''); persist() }); el.toggleKey.addEventListener('click', () => { const visible = el.key.type === 'text'; el.key.type = visible ? 'password' : 'text'; el.toggleKey.textContent = visible ? '顯示' : '隱藏' }); el.clearKey.addEventListener('click', () => { clearStoredKey(settings.provider); settings = { ...settings, apiKey: '', rememberKey: false }; el.key.value = ''; el.remember.checked = false; persist(); showModels('已清除目前 Provider 的 API Key。') }); el.remember.addEventListener('change', () => { settings = { ...settings, rememberKey: el.remember.checked }; persist() }); el.base.addEventListener('change', () => { settings = { ...settings, baseUrl: el.base.value.trim() }; persist() }); el.model.addEventListener('input', () => { settings = { ...settings, modelId: el.model.value.trim() }; persist() }); el.reasoning.addEventListener('change', () => { settings = { ...settings, reasoningEffort: el.reasoning.value }; persist() }); el.testProvider.addEventListener('click', testProvider); el.testConnection.addEventListener('click', testConnection)
   el.language.addEventListener('change', () => { settings = { ...settings, language: el.language.value, voiceName: '' }; persist(); populateVoices() }); el.voice.addEventListener('change', () => { settings = { ...settings, voiceName: el.voice.value }; persist() }); el.rate.addEventListener('input', () => { settings = { ...settings, rate: Number(el.rate.value) }; el.rateValue.value = el.rate.value; persist() }); el.mode.addEventListener('change', () => { settings = { ...settings, mode: el.mode.value }; persist() })
-  el.start.addEventListener('click', () => beginListening(false)); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按開始說話繼續。') }); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
+  el.start.addEventListener('click', () => beginListening(false)); el.stop.addEventListener('click', stopAll); el.stopSpeaking.addEventListener('click', () => { speaker.stop(); state.set(STATES.AWAIT_TAP, '朗讀已停止；按「重新朗讀」或開始說話繼續。') }); el.replay.addEventListener('click', replayLastReply); el.retry.addEventListener('click', retry); el.clearConversation.addEventListener('click', clearConversation); el.sendManual.addEventListener('click', () => { const value = el.manual.value.trim(); if (value) { primeSpeechSynthesis(settings.language); populateVoices(); state.beginSession(); submitText(value, state.session, state.nextTurn()) } }); el.manual.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') el.sendManual.click() })
   el.consentAccept.addEventListener('click', () => { saveConsent(); consentNeeded = false; el.consent.hidden = true; beginListening(false) }); window.speechSynthesis?.addEventListener?.('voiceschanged', populateVoices); document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && (state.state === STATES.LISTENING || state.state === STATES.SPEAKING || state.state === STATES.THINKING)) stopAll() })
 }
 
